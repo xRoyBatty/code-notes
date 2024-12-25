@@ -18,7 +18,7 @@ Container queries represent a fundamental shift in responsive design, moving fro
 ```
 
 ### Style Container Queries
-Allow styles to change based on the value of a container's custom property:
+Allow styles to change based on container's custom property:
 ```css
 .theme-container {
   --variant: 1;
@@ -72,15 +72,10 @@ html:has(#dark-mode:checked) {
 form:has(:user-invalid) .error {
   display: block;
 }
-
-/* Layout adaptations */
-.container:has(.sidebar.expanded) main {
-  margin-left: 320px;
-}
 ```
 
 ## Subgrid
-Subgrid allows nested grids to use the tracks defined by their parent:
+Subgrid allows nested grids to use parent tracks:
 
 ```css
 .main-grid {
@@ -95,72 +90,27 @@ Subgrid allows nested grids to use the tracks defined by their parent:
 }
 ```
 
-## Modern Text Features
-
-### Text Wrapping
-```css
-/* Balanced text wrapping for headlines */
-.headline {
-  text-wrap: balance;
-}
-
-/* Improved text wrapping for better readability */
-.content {
-  text-wrap: pretty;
-}
-```
-
 ## Native Nesting
 CSS now supports native nesting without preprocessors:
 
 ```css
 .component {
-  background: var(--bg-color);
+  /* Base styles */
+  color: var(--text-color);
   
   /* Nested media query */
   @media (prefers-color-scheme: dark) {
-    --bg-color: #333;
+    --text-color: white;
   }
   
   /* Nested pseudo-classes */
   &:is(:hover, :focus-visible) {
     transform: scale(1.02);
   }
-  
-  /* Parent context modification */
-  [data-theme="dark"] & {
-    filter: brightness(0.8);
-  }
-}
-```
-
-## New Color Spaces
-CSS introduced new color formats for better color manipulation:
-
-### HWB (Hue, Whiteness, Blackness)
-```css
-.element {
-  color: hwb(194 0% 0%);
-}
-```
-
-### LCH (Lightness, Chroma, Hue)
-```css
-.element {
-  color: lch(50% 50 50);
-}
-```
-
-### LAB
-```css
-.element {
-  color: lab(50% 50 50);
 }
 ```
 
 ## Scroll-Driven Animations
-New features for scroll-based animations:
-
 ```css
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -174,38 +124,39 @@ New features for scroll-based animations:
 }
 ```
 
+## New Color Spaces
+### HWB, LCH, and LAB
+```css
+.element {
+  /* HWB: Hue, Whiteness, Blackness */
+  color: hwb(194 0% 0%);
+  
+  /* LCH: Lightness, Chroma, Hue */
+  background: lch(50% 50 50);
+  
+  /* LAB */
+  border-color: lab(50% 50 50);
+}
+```
+
 ## Best Practices
-
 1. Progressive Enhancement
-   - Always provide fallbacks for newer features
-   - Use `@supports` to detect feature support
-   - Layer your styles from basic to enhanced
+   - Provide fallbacks for newer features
+   - Use @supports where needed
+   - Layer styles from basic to enhanced
 
-2. Performance Considerations
-   - Use container queries judiciously on complex layouts
+2. Performance
+   - Use container queries judiciously
+   - Test scroll animations for performance
    - Consider containment implications
-   - Test scroll-driven animations for performance impact
 
 3. Browser Support
-   - Most modern browsers support these features
-   - Safari may have different implementation timelines
-   - Always check caniuse.com for current support status
+   - Check caniuse.com for current support
+   - Implement graceful degradation
+   - Test across major browsers
 
-4. Accessibility
-   - Ensure color spaces maintain sufficient contrast
-   - Test animations with reduced motion preferences
-   - Validate that new selectors don't break screen readers
-
-## Future Considerations
-
-1. Keep an eye on:
-   - Further container query enhancements
-   - New color space implementations
-   - Additional scroll-driven animation features
-   - Expansion of the :has() selector capabilities
-
-2. Upcoming Proposals:
-   - More advanced nesting capabilities
-   - Additional container query features
-   - New color manipulation functions
-   - Enhanced animation controls
+## Future Features Watch
+- Advanced container query capabilities
+- New color space additions
+- Enhanced animation controls
+- More powerful selector combinations
