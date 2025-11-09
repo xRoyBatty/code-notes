@@ -1,0 +1,38 @@
+# User Personal Life OS Data
+# If you build your Life OS within this repo under users/,
+# it will not be committed. Your personal data stays private.
+users/
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Temp Files
+*.tmp
+*.log
+.temp/
+temp/
+
+# Environment
+.env
+.env.local
+
+# Node (if used in templates)
+node_modules/
+
+# Python (if used in templates)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/

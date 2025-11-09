@@ -61,10 +61,14 @@ Available templates:
    Please read CLAUDE.md to understand your role.
    I need help with: [your goal]
    ```
-3. **Claude will:**
+3. **Choose your approach:**
+   - **Quick Deployment:** Deploy ready-to-use templates to separate repos
+   - **Life Operating System:** Build comprehensive all-in-one personal system
+   - **Nested Development:** Build incrementally within this repo, graduate later
+4. **Claude will:**
    - Ask clarifying questions
-   - Suggest solutions
-   - Build customized templates
+   - Suggest best approach for your needs
+   - Build customized solutions
    - Guide you through setup
 
 ---

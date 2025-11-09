@@ -546,6 +546,471 @@ I'll guide you through the entire process, building incrementally, ensuring each
 
 ---
 
+## 🏗️ Nested Architecture: Working Within This Repo
+
+**An alternative workflow: Build everything as subfolders within this consultation repo.**
+
+### Why Build Nested vs Deploy Separate?
+
+**Build Nested (Subfolders Here) When:**
+- ✅ Prototyping and iterating on your Life OS
+- ✅ Want all your work in one place
+- ✅ Experimenting with different approaches
+- ✅ Personal use only (not sharing)
+- ✅ Building incrementally over weeks/months
+- ✅ Want consultation agent and your agents in same context
+
+**Deploy Separate (GitHub Repos) When:**
+- ✅ Solution is mature and stable
+- ✅ Want to share with others
+- ✅ Need clean version control per project
+- ✅ Multiple collaborators
+- ✅ Production systems
+- ✅ Want dedicated GitHub Actions/CI
+
+### Three Types of Nested Structures
+
+#### 1. **User Life OS Subfolder** (Your Personal System)
+
+```
+code-notes/
+├── CLAUDE.md                          # Consultation agent (me)
+├── knowledge/                         # Consultation knowledge base
+├── templates/                         # Templates for others
+└── users/
+    └── your-life-os/                  # Your personal Life OS
+        ├── .claude/
+        │   └── CLAUDE.md              # YOUR orchestrator agent
+        ├── knowledge/
+        ├── goals/
+        ├── projects/
+        ├── learning/
+        ├── automation/
+        ├── datasets/
+        └── context/
+```
+
+**Usage:**
+```bash
+# Start consultation with me
+claude-code-web /home/user/code-notes
+> "Read CLAUDE.md, I want to build my Life OS"
+
+# I create the structure under users/your-life-os/
+
+# Later, work directly with your orchestrator
+claude-code-web /home/user/code-notes/users/your-life-os
+> "Read .claude/CLAUDE.md and help me plan my day"
+```
+
+**Advantages:**
+- Your Life OS and consultation service in one repo
+- Easy to iterate with my help
+- Switch between consultation and personal use
+- All context in one place
+
+#### 2. **Working Solutions** (Code Without CLAUDE.md)
+
+These are practical tools, scripts, or apps that don't need an agent - just code that works.
+
+```
+code-notes/
+├── CLAUDE.md
+└── users/
+    └── your-life-os/
+        ├── .claude/CLAUDE.md          # Main orchestrator
+        └── automation/
+            ├── daily-planner/          # Working solution
+            │   ├── plan.py            # Script that generates plans
+            │   ├── config.json        # Settings
+            │   └── README.md          # How to use
+            │
+            ├── backup-to-vps/          # Working solution
+            │   ├── sync.sh            # Syncs sensitive data
+            │   ├── .env.example       # Config template
+            │   └── README.md
+            │
+            └── email-digest/           # Working solution
+                ├── digest.py
+                └── templates/
+```
+
+**When to Use Working Solutions:**
+- Mature scripts that don't need iteration
+- Tools you run manually or via cron
+- Integrations with external services
+- Utilities that are "done"
+
+**No CLAUDE.md Needed:** These are just code. Your main orchestrator can reference them, but they don't need their own agent.
+
+#### 3. **Project Subfolders with Sub-Agents**
+
+When building complex apps, give each project its own sub-agent for specialized help.
+
+```
+code-notes/
+└── users/
+    └── your-life-os/
+        ├── .claude/CLAUDE.md          # Main orchestrator
+        └── projects/
+            ├── habit-tracker-app/      # Complex project
+            │   ├── .claude/
+            │   │   └── CLAUDE.md      # Sub-agent for this app
+            │   ├── src/
+            │   ├── tests/
+            │   ├── package.json
+            │   └── README.md
+            │
+            └── personal-dashboard/     # Another complex project
+                ├── .claude/
+                │   └── CLAUDE.md      # Sub-agent for this app
+                ├── frontend/
+                ├── backend/
+                └── README.md
+```
+
+**Sub-Agent CLAUDE.md Example:**
+
+```markdown
+# Habit Tracker App - Development Agent
+
+## Your Role
+You are a development assistant for this habit tracking application.
+
+## Project Context
+- **Stack:** React + Node.js + SQLite
+- **Purpose:** Personal habit tracking with streaks
+- **User:** Building for themselves, not professional developer
+- **Status:** In development (see TODO.md)
+
+## Your Responsibilities
+1. **Development Tasks:**
+   - Write React components
+   - Create API endpoints
+   - Design database schema
+   - Write tests
+
+2. **Code Review:**
+   - Check for bugs
+   - Suggest improvements
+   - Ensure best practices
+
+3. **Explanation:**
+   - Explain architectural decisions
+   - Teach React/Node patterns
+   - Clarify when user asks
+
+## Parent Context
+- Parent agent (main orchestrator) knows about user's goals
+- This app aligns with user's goal: Build better habits
+- Check ../../../goals/long-term/health.md for context
+- Reference ../../../knowledge/ for user's learning notes
+
+## When User Works Here
+- User will `cd` into this project directory
+- Start Claude session pointing to this folder
+- You'll be invoked via this CLAUDE.md
+- Focus ONLY on this app (don't orchestrate other projects)
+
+## Communication with Parent
+- Update ../../TODO.md when milestones complete
+- Log progress in ../../progress/projects.md
+- Reference shared knowledge when relevant
+```
+
+**Workflow:**
+
+```bash
+# Work on habit tracker app specifically
+cd /home/user/code-notes/users/your-life-os/projects/habit-tracker-app
+claude-code-web .
+
+# This sub-agent focuses ONLY on habit tracker
+> "Read .claude/CLAUDE.md and help me implement streak calculation"
+
+# Later, return to main orchestrator
+cd /home/user/code-notes/users/your-life-os
+claude-code-web .
+
+# Main orchestrator sees all projects
+> "What's the status of my projects?"
+```
+
+### VPS Integration for Sensitive Data
+
+**Problem:** Some data shouldn't be in GitHub (credentials, personal info, API keys).
+
+**Solution:** Store sensitive data on your VPS, reference it from repo scripts.
+
+#### Architecture
+
+```
+code-notes/
+└── users/
+    └── your-life-os/
+        ├── datasets/
+        │   ├── user-profile.md         # ✅ Safe for GitHub
+        │   ├── preferences.md          # ✅ Safe for GitHub
+        │   └── vps-config.json         # ✅ Contains VPS endpoints only
+        │
+        └── automation/
+            ├── vps-sync.sh             # ✅ Script to sync (no secrets)
+            └── .env.example            # ✅ Template (no real values)
+
+VPS: /home/user/sensitive-data/
+├── financial-records/
+├── health-data/
+├── api-keys.json
+└── private-notes/
+```
+
+#### VPS API Setup Example
+
+**On your VPS:**
+
+```bash
+# Create simple API to serve/store sensitive data
+# /home/user/vps-api/server.py
+
+from flask import Flask, request, jsonify
+import json
+import os
+
+app = Flask(__name__)
+DATA_DIR = "/home/user/sensitive-data"
+
+@app.route('/get/<path:filename>', methods=['GET'])
+def get_file(filename):
+    """Retrieve sensitive file"""
+    filepath = os.path.join(DATA_DIR, filename)
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as f:
+            return jsonify({"content": f.read()})
+    return jsonify({"error": "Not found"}), 404
+
+@app.route('/put/<path:filename>', methods=['POST'])
+def put_file(filename):
+    """Store sensitive file"""
+    content = request.json.get('content')
+    filepath = os.path.join(DATA_DIR, filename)
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, 'w') as f:
+        f.write(content)
+    return jsonify({"status": "success"})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+```
+
+```bash
+# Run on VPS
+python3 server.py &
+```
+
+**In your repo (users/your-life-os/automation/vps-sync.sh):**
+
+```bash
+#!/bin/bash
+# Sync script - NO secrets in here!
+
+VPS_URL="http://your-vps-ip:5000"  # Or use env var
+
+# Fetch sensitive data when needed
+fetch_sensitive() {
+    local filename=$1
+    curl -s "${VPS_URL}/get/${filename}" | jq -r '.content'
+}
+
+# Store sensitive data
+store_sensitive() {
+    local filename=$1
+    local content=$2
+    curl -s -X POST "${VPS_URL}/put/${filename}" \
+         -H "Content-Type: application/json" \
+         -d "{\"content\": \"${content}\"}"
+}
+
+# Example: Fetch API keys from VPS
+API_KEYS=$(fetch_sensitive "api-keys.json")
+# Use in scripts but never commit
+
+# Example: Store analysis results to VPS
+ANALYSIS_RESULT="$(cat analysis-output.txt)"
+store_sensitive "analysis-results/$(date +%Y-%m-%d).txt" "$ANALYSIS_RESULT"
+```
+
+**In your orchestrator CLAUDE.md:**
+
+```markdown
+## VPS Integration
+
+When user requests operations with sensitive data:
+
+1. **Never put sensitive data in GitHub**
+2. **Use automation/vps-sync.sh** to fetch/store
+3. **Process locally or on VPS**
+4. **Reference VPS data in scripts only**
+
+Example:
+```
+User: "Analyze my financial data"
+
+You:
+1. Check automation/vps-sync.sh exists
+2. Run: ./automation/vps-sync.sh fetch financial-records/latest.csv
+3. Process data locally (don't commit results)
+4. Optionally store results to VPS
+5. Report insights to user
+```
+```
+
+### Decision Tree: Where to Build What
+
+```
+Do you need an agent to help build/maintain it?
+├─ YES: Create subfolder with .claude/CLAUDE.md
+│   ├─ Is it a complex project (app, system)?
+│   │   └─ YES: projects/<name>/.claude/CLAUDE.md (sub-agent)
+│   │
+│   └─ Is it your overall life system?
+│       └─ YES: users/your-life-os/.claude/CLAUDE.md (orchestrator)
+│
+└─ NO: Create as working solution (just code)
+    ├─ automation/<name>/ (scripts, no CLAUDE.md)
+    ├─ tools/<name>/
+    └─ integrations/<name>/
+
+Does it contain sensitive data?
+├─ YES:
+│   ├─ Store sensitive parts on VPS
+│   ├─ Reference via API/scripts
+│   └─ Never commit sensitive files
+│
+└─ NO: Commit everything to GitHub
+```
+
+### Example Workflow: Building Your Life OS Here
+
+**Session 1: Initial Consultation**
+```bash
+cd /home/user/code-notes
+claude-code-web .
+
+> "Read CLAUDE.md. I want to build a Life OS focused on:
+   - Goal tracking
+   - Knowledge management
+   - Project development
+   - Learning curricula
+
+   I have a VPS for sensitive data.
+   Build it under users/my-life-os/"
+```
+
+**I (consultation agent) will:**
+1. Create `users/my-life-os/` structure
+2. Write `users/my-life-os/.claude/CLAUDE.md` (your orchestrator)
+3. Set up initial domains (goals/, knowledge/, projects/, etc.)
+4. Create `users/my-life-os/automation/vps-sync.sh`
+5. Write `users/my-life-os/.claude/TODO.md` with build plan
+
+**Session 2-10: Incremental Building**
+```bash
+# Option A: Continue with consultation agent
+cd /home/user/code-notes
+claude-code-web .
+> "Continue building my Life OS - implement knowledge management"
+
+# Option B: Work directly with your orchestrator
+cd /home/user/code-notes/users/my-life-os
+claude-code-web .
+> "Read .claude/CLAUDE.md and help me add my first goal"
+```
+
+**Session 11+: Building Complex Projects**
+```bash
+# Start a new app project
+cd /home/user/code-notes/users/my-life-os
+> "I want to build a habit tracker app. Create projects/habit-tracker/"
+
+# Your orchestrator creates:
+# - projects/habit-tracker/.claude/CLAUDE.md (sub-agent)
+# - Initial app structure
+# - Links to your goals (why you're building it)
+
+# Then work on the app directly
+cd projects/habit-tracker
+claude-code-web .
+> "Read .claude/CLAUDE.md and help me build the streak calculation feature"
+```
+
+### When to Graduate to Separate Repo
+
+Eventually, you might want to move your Life OS or a project to its own repo:
+
+**Graduate When:**
+- System is stable and mature
+- You want cleaner version control
+- You want to share publicly
+- You want dedicated CI/CD
+- Repo is getting too large
+
+**How to Graduate:**
+
+```bash
+# From within users/your-life-os/
+cd /home/user/code-notes/users/your-life-os
+
+# Initialize as its own repo
+git init -b main
+git add .
+git commit -m "Graduate Life OS to standalone repo"
+
+# Create new GitHub repo
+gh repo create my-life-os --private --source=. --push
+
+# Clone in new location
+cd ~
+gh repo clone my-life-os
+
+# Now work there independently
+cd ~/my-life-os
+claude-code-web .
+```
+
+**Or graduate a specific project:**
+
+```bash
+cd /home/user/code-notes/users/your-life-os/projects/habit-tracker
+
+git init -b main
+git add .
+git commit -m "Graduate habit tracker to standalone repo"
+gh repo create habit-tracker-app --public --source=. --push
+
+# Share with others!
+```
+
+### Summary: Three Development Modes
+
+**1. Consultation Mode**
+- Work in `/home/user/code-notes`
+- Consultation agent (me) active
+- Design and prototype
+
+**2. Orchestrator Mode**
+- Work in `/home/user/code-notes/users/your-life-os`
+- Your personal orchestrator active
+- Day-to-day Life OS management
+
+**3. Project Mode**
+- Work in `/home/user/code-notes/users/your-life-os/projects/app-name`
+- Project-specific sub-agent active
+- Focused development on one app
+
+**All three can coexist!** Build iteratively, graduate when ready.
+
+---
+
 ## 🎓 Common Use Cases
 
 ### For Researchers & Students
@@ -961,6 +1426,7 @@ Sound good? Let's start with those questions..."
 ```
 claude-code-consultation/
 ├── CLAUDE.md                    # This file - main guide
+├── README.md                    # Public-facing description
 ├── knowledge/                   # Comprehensive guides
 │   ├── CLAUDE_CODE_COMPLETE_MANUAL.md
 │   ├── SKILLS_ADVANCED_GUIDE.md
@@ -975,8 +1441,17 @@ claude-code-consultation/
 │   ├── self-learning-repo/
 │   ├── autonomous-dev-environment/
 │   └── project-scaffolder/
-└── README.md                    # Public-facing description
+└── users/                       # Optional: Build your Life OS here
+    └── your-life-os/           # Your personal system (nested)
+        ├── .claude/            # Your orchestrator
+        ├── knowledge/          # Your notes
+        ├── goals/              # Your goals
+        ├── projects/           # Your apps (can have sub-agents)
+        ├── automation/         # Working solutions
+        └── datasets/           # Your data
 ```
+
+**Note:** The `users/` directory is optional and created when you build your Life OS within this repo instead of deploying separately.
 
 ---
 
