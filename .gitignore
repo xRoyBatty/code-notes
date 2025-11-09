@@ -1,0 +1,3 @@
+# Temporary zip files
+*.zip
+*.zip.b64
